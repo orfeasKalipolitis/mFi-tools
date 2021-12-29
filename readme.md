@@ -1,11 +1,12 @@
 # About
 This adds MQTT features to Ubiquiti Networks mFi devices.
 
-This is version 3, which aims to comply with [homie MQTT convention](https://github.com/marvinroger/homie). 
+This is version 4, which does not aim to comply with [homie MQTT convention](https://github.com/marvinroger/homie), as I don't see the appeal. 
 
-The implementation of the convention is not complete yet.
+It´s forked from the excelent work of a lot of projects, follow the proverbial string if interested.
 
-It´s forked from excelent work of magcode/mpower-tools, and we just add mPort compatibility and auto detect port configuration features.
+# mFi device Credentials
+If you have managed to adopt your device into a controller, then the username and password will match those credentials, if not, you probably still have the default ubnt:ubnt.
 
 # Compatible Devices
 - mPower Mini and mPower Outlet 3 Ports
@@ -13,16 +14,31 @@ It´s forked from excelent work of magcode/mpower-tools, and we just add mPort c
 - mFiTHS, mFiCS, mFiMSW and mFiDS
 
 # Warning
-Use at your own risk!
+Use at your own risk! These devices are OLD and DEPRECATED. Installing custom software on them is definitely not advisable and you should not be doing that if you have no clue what you are doing.
+The openssl package on the mPower devices is running deprecated TLS and as such is a major PITA to connect to through ssh or make any other kind of encrypted communication.
 
 # Installation
-Use a SSH client and connect to your mFi device.
-Enter the following commands
+Use the download script to download all the necessary files locally.
+Copy the downloaded files over to the mFi device.
+Because of the old openssl package, we need to set the exchange and cipher to something that the mFi device understands.
 
 ```
-mkdir /var/etc/persistent/mqtt
-wget --no-check-certificate -q https://raw.githubusercontent.com/maletazul/mFi-tools/master/mqtt/client/install-client.sh -O /var/etc/persistent/mqtt/install-client.sh;chmod 755 /var/etc/persistent/mqtt/install-client.sh;/var/etc/persistent/mqtt/install-client.sh
+scp -o KexAlgorithms=+diffie-hellman-group1-sha1 -c aes256-cbc -r locallySavedMQTTfolder user@mFiDeviceIP:/var/etc/persistent
+```
 
+Use an SSH client and connect to your mFi device.
+
+```
+ssh -oKexAlgorithms=+diffie-hellman-group1-sha1 user@mFiDeviceIP -c aes256-cbc
+```
+
+Make sure that the files are saved in the following structure:
+- everything is in /var/etc/persistent/mqtt (the binaries and library should be exactly there)
+- /var/etc/persistent/mqtt/client should contain all the scripts needed
+
+Run the install-only script. [Configure](#Configuration). Save and reboot.
+
+```
 save
 reboot
 ```
@@ -33,7 +49,7 @@ reboot
 ```
 The script also starts automatically approx 3 minutes after booting the device (using rc.poststart).
 
-# Stoping
+# Stopping
 ```
 /var/etc/persistent/mqtt/client/mqstop.sh
 ```
@@ -190,6 +206,6 @@ MQTT client Provides an MQTT client.
 
 Setup examples for Home Assistant/Hassio.io and openHAB
 
-Forked from https://github.com/magcode/mpower-tools
+Originally forked from https://github.com/magcode/mpower-tools (I think)
 
-New v3 features addon´s developed by keys, ddvs1 and nrocha.
+New v4 features include mostly better documentation and instructions on how to communicate with your mFi devices.
