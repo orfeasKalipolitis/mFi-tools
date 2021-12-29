@@ -1,7 +1,7 @@
 #!/bin/sh
 
 log() {
-        logger -s -t "mqtt" "$*"
+        logger -s -t "mqtt-pub" "$*"
 }
 
 # read config file
